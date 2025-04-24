@@ -1,10 +1,9 @@
+//R SARAVANAN  ME24I1006
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// -------------------------------
 // Queue for Delivery Requests
-// -------------------------------
 char deliveryQueue[6][20];
 int deliveryFront = 0, deliveryRear = -1;
 
@@ -23,9 +22,7 @@ char* dequeue() {
 	return NULL;  // Queue is empty
 }
 
-// -------------------------------
 // Stack for Urgent Deliveries
-// -------------------------------
 char urgentStack[6][20];
 int urgentTop = -1;
 
@@ -44,9 +41,8 @@ char* pop() {
 	return NULL;  // Stack is empty
 }
 
-// -------------------------------
+
 // Array for Flight Log
-// -------------------------------
 char flightLog[6][20];
 int flightLogCount = 0;
 
@@ -62,9 +58,7 @@ void logDelivery(char item[]) {
 	}
 }
 
-// -------------------------------
 // Singly Linked List for Overloaded Drones
-// -------------------------------
 struct OverloadNode {
 	char name[20];
 	struct OverloadNode *next;
@@ -78,9 +72,7 @@ void addOverload(char name[]) {
 	overloadHead = n;
 }
 
-// -------------------------------
 // Doubly Linked List for Serviced Drones
-// -------------------------------
 struct ServicedNode {
 	char name[20];
 	struct ServicedNode *prev, *next;
@@ -173,9 +165,9 @@ void showEmergency(int rounds) {
 	printf("...\n");
 }
 
-// -------------------------------
+
 // Main Function - Menu Based Simulation
-// -------------------------------
+
 int main() {
 	int choice;
 	char input[20];
@@ -195,7 +187,7 @@ int main() {
 
 		switch (choice) {
 			case 1:
-				printf("Enter delivery: ");
+				printf("Enter delivery (e.g., "Food", "Medicine", "Tools", "Water", "Parts", "Fuel") :  ");
 				scanf("%s", input);
 				enqueue(input);
 				break;
