@@ -1,0 +1,246 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// -------------------------------
+// Queue for Delivery Requests
+// -------------------------------
+char deliveryQueue[6][20];
+int deliveryFront = 0, deliveryRear = -1;
+
+// Adds a new delivery request to the queue
+void enqueue(char item[]) {
+	if (deliveryRear < 5)
+		strcpy(deliveryQueue[++deliveryRear], item);  // Insert item and increment rear
+	else
+		printf("Queue Full\n");
+}
+
+// Removes the next delivery request from the queue
+char* dequeue() {
+	if (deliveryFront <= deliveryRear)
+		return deliveryQueue[deliveryFront++];  // Return item and increment front
+	return NULL;  // Queue is empty
+}
+
+// -------------------------------
+// Stack for Urgent Deliveries
+// -------------------------------
+char urgentStack[6][20];
+int urgentTop = -1;
+
+// Pushes a delivery onto the urgent stack
+void push(char item[]) {
+	if (urgentTop < 5)
+		strcpy(urgentStack[++urgentTop], item);  // Insert at top
+	else
+		printf("Stack Full\n");
+}
+
+// Pops the most recent urgent delivery
+char* pop() {
+	if (urgentTop >= 0)
+		return urgentStack[urgentTop--];  // Return top and decrement
+	return NULL;  // Stack is empty
+}
+
+// -------------------------------
+// Array for Flight Log
+// -------------------------------
+char flightLog[6][20];
+int flightLogCount = 0;
+
+// Adds a delivery to the flight log (circular buffer style)
+void logDelivery(char item[]) {
+	if (flightLogCount < 6) {
+		strcpy(flightLog[flightLogCount++], item);
+	} else {
+		// If log is full, remove oldest entry and add new one at the end
+		for (int i = 1; i < 6; i++)
+			strcpy(flightLog[i - 1], flightLog[i]);
+		strcpy(flightLog[5], item);
+	}
+}
+
+// -------------------------------
+// Singly Linked List for Overloaded Drones
+// -------------------------------
+struct OverloadNode {
+	char name[20];
+	struct OverloadNode *next;
+} *overloadHead = NULL;
+
+// Adds a new drone to the overloaded list
+void addOverload(char name[]) {
+	struct OverloadNode *n = malloc(sizeof(struct OverloadNode));
+	strcpy(n->name, name);
+	n->next = overloadHead;  // Insert at head
+	overloadHead = n;
+}
+
+// -------------------------------
+// Doubly Linked List for Serviced Drones
+// -------------------------------
+struct ServicedNode {
+	char name[20];
+	struct ServicedNode *prev, *next;
+} *servicedHead = NULL;
+
+// Moves a drone from overloaded list to serviced list
+void moveToServiced(char name[]) {
+	struct OverloadNode *prev = NULL, *cur = overloadHead;
+	while (cur && strcmp(cur->name, name) != 0) {
+		prev = cur;
+		cur = cur->next;
+	}
+	if (cur) {
+		// Remove from overload list
+		printf("%s carried excess tools, recalibrated by techs\n", name);
+		if (prev) prev->next = cur->next;
+		else overloadHead = cur->next;
+
+		// Add to head of serviced list
+		struct ServicedNode *d = malloc(sizeof(struct ServicedNode));
+		strcpy(d->name, name);
+		d->prev = d->next = NULL;
+
+		if (!servicedHead)
+			servicedHead = d;
+		else {
+			d->next = servicedHead;
+			servicedHead->prev = d;
+			servicedHead = d;
+		}
+	} else {
+		printf("Drone not found in overloaded list\n");
+	}
+}
+
+// Displays serviced drones in both forward and reverse order
+void showServiced() {
+	struct ServicedNode *t = servicedHead, *last = NULL;
+	printf("Forward: ");
+	while (t) {
+		printf("%s -> ", t->name);
+		if (t->next == NULL) last = t;  // Track last for backward pass
+		t = t->next;
+	}
+	printf("NULL\n");
+
+	printf("Backward: ");
+	while (last) {
+		printf("%s -> ", last->name);
+		last = last->prev;
+	}
+	printf("NULL\n");
+}
+
+// -------------------------------
+// Circular Linked List for Emergency Drones
+// -------------------------------
+struct EmergencyNode {
+	char name[20];
+	struct EmergencyNode *next;
+} *emergencyCircular = NULL;
+
+// Adds a drone to the emergency rerouting circular list
+void addEmergency(char name[]) {
+	struct EmergencyNode *n = malloc(sizeof(struct EmergencyNode));
+	printf("%s is rerouted with storm-resistant casing and wind shielding\n", name);
+	strcpy(n->name, name);
+
+	if (!emergencyCircular) {
+		emergencyCircular = n;
+		n->next = n;  // Circular to itself
+	} else {
+		n->next = emergencyCircular->next;
+		emergencyCircular->next = n;
+		emergencyCircular = n;
+	}
+}
+
+// Displays emergency drones in circular traversal
+void showEmergency(int rounds) {
+	if (!emergencyCircular) {
+		printf("No emergency drones.\n");
+		return;
+	}
+	struct EmergencyNode *t = emergencyCircular->next;
+	for (int i = 0; i < rounds * 2; i++) {
+		printf("%s -> ", t->name);
+		t = t->next;
+	}
+	printf("...\n");
+}
+
+// -------------------------------
+// Main Function - Menu Based Simulation
+// -------------------------------
+int main() {
+	int choice;
+	char input[20];
+	while (1) {
+		printf("\n--- Cargo Drone Traffic Controller ---\n");
+		printf("1. Add Delivery Requests (Queue)\n");
+		printf("2. Dispatch Urgent Deliveries (Stack)\n");
+		printf("3. Log Delivery (Flight Log)\n");
+		printf("4. Add Overloaded Drone\n");
+		printf("5. Move Drone to Serviced\n");
+		printf("6. Show Serviced Drones\n");
+		printf("7. Add Emergency Rerouting\n");
+		printf("8. Show Emergency Drones\n");
+		printf("9. Exit\n");
+		printf("Enter choice: ");
+		scanf("%d", &choice);
+
+		switch (choice) {
+			case 1:
+				printf("Enter delivery: ");
+				scanf("%s", input);
+				enqueue(input);
+				break;
+			case 2:
+				// Transfer all from queue to stack
+				while (deliveryFront <= deliveryRear)
+					push(dequeue());
+				printf("Dispatch Order:\n");
+				while (urgentTop >= 0)
+					printf("%s\n", pop());
+				break;
+			case 3:
+				printf("Enter delivery ID (e.g., Del7): ");
+				scanf("%s", input);
+				logDelivery(input);
+				printf("Current Log:\n");
+				for (int i = 0; i < flightLogCount; i++)
+					printf("%s\n", flightLog[i]);
+				break;
+			case 4:
+				printf("Enter overloaded drone name: ");
+				scanf("%s", input);
+				addOverload(input);
+				break;
+			case 5:
+				printf("Enter drone name to mark as serviced: ");
+				scanf("%s", input);
+				moveToServiced(input);
+				break;
+			case 6:
+				showServiced();
+				break;
+			case 7:
+				printf("Enter emergency drone name: ");
+				scanf("%s", input);
+				addEmergency(input);
+				break;
+			case 8:
+				showEmergency(2);  // Show 2 rounds of emergency circulation
+				break;
+			case 9:
+				printf("Exiting...\n");
+				return 0;
+			default:
+				printf("Invalid choice!\n");
+		}
+	}
+}
