@@ -127,9 +127,7 @@ void showServiced() {
 	printf("NULL\n");
 }
 
-// -------------------------------
 // Circular Linked List for Emergency Drones
-// -------------------------------
 struct EmergencyNode {
 	char name[20];
 	struct EmergencyNode *next;
@@ -162,7 +160,7 @@ void showEmergency(int rounds) {
 		printf("%s -> ", t->name);
 		t = t->next;
 	}
-	printf("...\n");
+	printf("\n");
 }
 
 
@@ -200,7 +198,7 @@ int main() {
 					printf("%s\n", pop());
 				break;
 			case 3:
-				printf("Enter delivery ID (e.g., Del7): ");
+				printf("Enter delivery ID (e.g., Del1): ");
 				scanf("%s", input);
 				logDelivery(input);
 				printf("Current Log:\n");
@@ -229,7 +227,7 @@ int main() {
 				showEmergency(2);  // Show 2 rounds of emergency circulation
 				break;
 			case 9:
-				printf("Exiting...\n");
+				printf("Exiting\n");
 				return 0;
 			default:
 				printf("Invalid choice!\n");
