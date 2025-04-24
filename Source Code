@@ -185,7 +185,7 @@ int main() {
 
 		switch (choice) {
 			case 1:
-				printf("Enter delivery (e.g., "Food", "Medicine", "Tools", "Water", "Parts", "Fuel") :  ");
+				printf("Enter delivery (e.g., Food, Medicine, Tools, Water, Parts, Fuel) :  ");
 				scanf("%s", input);
 				enqueue(input);
 				break;
